@@ -13,7 +13,9 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CreditosPlataforma.Web</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    CreditosPlataforma.Web
+                </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target=".navbar-collapse"
@@ -59,6 +61,23 @@
                                 Nueva solicitud
                             </a>
                         </li>
+
+                        @{
+                            var ultimaSolicitudId = Context.Session.GetInt32("UltimaSolicitudId");
+                            var ultimaSolicitudMonto = Context.Session.GetString("UltimaSolicitudMonto");
+                        }
+
+                        @if (ultimaSolicitudId.HasValue)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Solicitudes"
+                                   asp-action="Detalle"
+                                   asp-route-id="@ultimaSolicitudId">
+                                    Ver última solicitud (S/ @ultimaSolicitudMonto)
+                                </a>
+                            </li>
+                        }
 
                     </ul>
 
