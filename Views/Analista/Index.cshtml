@@ -1,0 +1,62 @@
+@model IEnumerable<CreditosPlataforma.Web.Models.SolicitudCredito>
+
+@{
+    ViewData["Title"] = "Panel de Analista";
+}
+
+<h1>🧑‍💼 Solicitudes pendientes de evaluación</h1>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success">✅ @TempData["Exito"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">⚠️ @TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No hay solicitudes pendientes por evaluar.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Ingresos mensuales</th>
+                <th>Monto solicitado</th>
+                <th>Fecha</th>
+                <th>Límite aprobable (5x ingresos)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                var limite = s.Cliente!.IngresosMensuales * 5;
+                var excedeLimite = s.MontoSolicitado > limite;
+                <tr class="@(excedeLimite ? "table-warning" : "")">
+                    <td>@s.Cliente.UsuarioId</td>
+                    <td>S/ @s.Cliente.IngresosMensuales.ToString("N2")</td>
+                    <td>S/ @s.MontoSolicitado.ToString("N2")</td>
+                    <td>@s.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        S/ @limite.ToString("N2")
+                        @if (excedeLimite)
+                        {
+                            <span class="badge bg-danger">Excede límite</span>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="Aprobar" asp-route-id="@s.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-success" @(excedeLimite ? "disabled" : "")>Aprobar</button>
+                        </form>
+                        <a asp-action="Rechazar" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Rechazar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

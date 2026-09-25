@@ -1,0 +1,25 @@
+@model CreditosPlataforma.Web.Models.ViewModels.DecisionSolicitudViewModel
+
+@{
+    ViewData["Title"] = "Rechazar solicitud";
+}
+
+<h1>Rechazar solicitud #@Model.SolicitudId</h1>
+
+<form asp-action="Rechazar" method="post" class="col-md-6">
+    <input type="hidden" asp-for="SolicitudId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="MotivoRechazo" class="form-label"></label>
+        <textarea asp-for="MotivoRechazo" class="form-control" rows="3" placeholder="Explica por qué se rechaza..."></textarea>
+        <span asp-validation-for="MotivoRechazo" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Confirmar rechazo</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
