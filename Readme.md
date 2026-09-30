@@ -7,7 +7,7 @@ Aplicación MVC en .NET 10 con Identity, EF Core + SQLite, sesión y caché con 
 | Recurso | URL |
 |---|---|
 | 📦 Repositorio GitHub | https://github.com/David-Clouds/creditos_practica |
-| 🌐 Aplicación en Render | *(pendiente de desplegar)* |
+| 🌐 Aplicación en Render | https://creditos-practica.onrender.com |
 
 ## Tecnologías
 
