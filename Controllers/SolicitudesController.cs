@@ -188,5 +188,28 @@ namespace CreditosPlataforma.Web.Controllers
 
             return View(solicitud);
         }
+
+        // GET: Solicitudes/Estado/5 (para reconciliar tras reconexión del WebSocket)
+        [HttpGet]
+        public async Task<IActionResult> Estado(int id)
+        {
+            var usuarioId = _userManager.GetUserId(User);
+
+            var solicitud = await _context.SolicitudesCredito
+                .Include(s => s.Cliente)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (solicitud == null || solicitud.Cliente?.UsuarioId != usuarioId)
+            {
+                return NotFound();
+            }
+
+            return Json(new
+            {
+                solicitudId = solicitud.Id,
+                estado = solicitud.Estado.ToString(),
+                motivoRechazo = solicitud.MotivoRechazo
+            });
+        }
     }
 }

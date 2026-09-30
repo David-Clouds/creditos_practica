@@ -59,18 +59,29 @@ else
                 <th></th>
             </tr>
         </thead>
+
         <tbody>
             @foreach (var s in Model.Resultados)
             {
-                <tr>
+                <tr data-solicitud-id="@s.Id">
                     <td>S/ @s.MontoSolicitado.ToString("N2")</td>
                     <td>@s.FechaSolicitud.ToString("dd/MM/yyyy")</td>
                     <td>
-                        <span class="badge bg-@(s.Estado == EstadoSolicitud.Aprobado ? "success" : s.Estado == EstadoSolicitud.Rechazado ? "danger" : "warning")">
+                        <span data-estado-badge class="badge bg-@(s.Estado == EstadoSolicitud.Aprobado ? "success" : s.Estado == EstadoSolicitud.Rechazado ? "danger" : "warning")">
                             @s.Estado
                         </span>
+
+                        <div data-motivo-contenedor class="small text-muted @(string.IsNullOrEmpty(s.MotivoRechazo) ? "d-none" : "")">
+                            Motivo: <span data-motivo-rechazo>@s.MotivoRechazo</span>
+                        </div>
                     </td>
-                    <td><a asp-action="Detalle" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Ver detalle</a></td>
+                    <td>
+                        <a asp-action="Detalle"
+                           asp-route-id="@s.Id"
+                           class="btn btn-sm btn-outline-primary">
+                            Ver detalle
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>

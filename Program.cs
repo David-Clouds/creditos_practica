@@ -2,6 +2,8 @@ using CreditosPlataforma.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using CreditosPlataforma.Web.Services;
+using CreditosPlataforma.Web.Hubs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlite(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddSignalR();
+
+
 
 // Redis
 builder.Services.AddStackExchangeRedisCache(options =>
@@ -43,6 +49,7 @@ options.SignIn.RequireConfirmedAccount = false;
 .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -65,9 +72,16 @@ app.UseSession();
 app.MapStaticAssets();
 
 app.MapControllerRoute(
+feature/cloudmq-notificaciones
 name: "default",
 pattern: "{controller=Home}/{action=Index}/{id?}")
 .WithStaticAssets();
+=======
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
+app.MapHub<SolicitudesHub>("/hubs/solicitudes");
+main
 
 app.MapRazorPages()
 .WithStaticAssets();
