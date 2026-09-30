@@ -4,26 +4,23 @@ using Microsoft.EntityFrameworkCore;
 using CreditosPlataforma.Web.Services;
 using CreditosPlataforma.Web.Hubs;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlite(connectionString));
+    options.UseSqlite(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddSignalR();
 
-
-
 // Redis
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-options.Configuration = builder.Configuration["Redis:ConnectionString"];
-options.InstanceName = "creditos:";
+    options.Configuration = builder.Configuration["Redis:ConnectionString"];
+    options.InstanceName = "creditos:";
 });
 
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
@@ -35,14 +32,14 @@ builder.Services.AddHostedService<NotificacionConsumerService>();
 // Session
 builder.Services.AddSession(options =>
 {
-options.IdleTimeout = TimeSpan.FromMinutes(30);
-options.Cookie.HttpOnly = true;
-options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultUI()
@@ -56,8 +53,8 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-app.UseExceptionHandler("/Home/Error");
-app.UseHsts();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -72,23 +69,26 @@ app.UseSession();
 app.MapStaticAssets();
 
 app.MapControllerRoute(
-feature/cloudmq-notificaciones
-name: "default",
-pattern: "{controller=Home}/{action=Index}/{id?}")
-.WithStaticAssets();
-=======
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
 app.MapHub<SolicitudesHub>("/hubs/solicitudes");
-main
 
 app.MapRazorPages()
-.WithStaticAssets();
+    .WithStaticAssets();
 
+// Configurar el puerto proporcionado por Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
+
+// Aplicar migraciones y ejecutar datos iniciales
 using (var scope = app.Services.CreateScope())
 {
-await SeedData.InicializarAsync(scope.ServiceProvider);
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+
+    await SeedData.InicializarAsync(scope.ServiceProvider);
 }
 
 app.Run();
