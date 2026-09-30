@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CreditosPlataforma.Web.Services;
 
 namespace CreditosPlataforma.Web.Controllers
 {
@@ -13,11 +14,13 @@ namespace CreditosPlataforma.Web.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
-
-        public SolicitudesController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        private readonly IRabbitMqPublisher _rabbitMqPublisher;
+        
+        public SolicitudesController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IRabbitMqPublisher rabbitMqPublisher)
         {
             _context = context;
             _userManager = userManager;
+            _rabbitMqPublisher = rabbitMqPublisher;
         }
 
         // GET: Solicitudes/Index (Mis solicitudes)
@@ -150,6 +153,17 @@ namespace CreditosPlataforma.Web.Controllers
 
             _context.SolicitudesCredito.Add(solicitud);
             await _context.SaveChangesAsync();
+
+            // Publicar en RabbitMQ DESPUÉS de guardar en la base
+            var publicado = await _rabbitMqPublisher.PublicarSolicitudRegistradaAsync(solicitud.Id, usuarioId);
+
+            if (!publicado)
+            {
+                // No revertimos la solicitud: ya está guardada. Solo advertimos que la notificación async puede demorar.
+                modelo.MensajeExito = "Solicitud registrada, aunque hubo un problema notificando al sistema de mensajería.";
+            }
+
+            // Limpiamos el modelo para la siguiente solicitud, pero mostramos éxito
 
             // Limpiamos el modelo para la siguiente solicitud, pero mostramos éxito
             return View(new RegistroSolicitudViewModel

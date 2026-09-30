@@ -14,14 +14,25 @@ namespace CreditosPlataforma.Web.Data
 
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<SolicitudCredito> SolicitudesCredito { get; set; }
+        public DbSet<Notificacion> Notificaciones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Notificacion>(entity =>
+            {
+                // Un MessageId solo puede procesarse una vez (evita duplicados en redelivery)
+                entity.HasIndex(n => n.MessageId)
+                      .IsUnique()
+                      .HasDatabaseName("IX_Notificacion_MessageId_Unico");
+            });
+
             builder.Entity<Cliente>(entity =>
             {
-                entity.ToTable(t => t.HasCheckConstraint("CK_Cliente_IngresosMensuales", "IngresosMensuales > 0"));
+                entity.ToTable(t => t.HasCheckConstraint(
+                    "CK_Cliente_IngresosMensuales",
+                    "IngresosMensuales > 0"));
             });
 
             builder.Entity<SolicitudCredito>(entity =>
@@ -29,7 +40,9 @@ namespace CreditosPlataforma.Web.Data
                 entity.Property(s => s.Estado)
                       .HasConversion<string>();
 
-                entity.ToTable(t => t.HasCheckConstraint("CK_SolicitudCredito_Monto", "MontoSolicitado > 0"));
+                entity.ToTable(t => t.HasCheckConstraint(
+                    "CK_SolicitudCredito_Monto",
+                    "MontoSolicitado > 0"));
 
                 // Restricción: solo una solicitud Pendiente por cliente
                 entity.HasIndex(s => s.ClienteId)
