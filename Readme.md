@@ -50,11 +50,13 @@ Ninguna clave está en el código ni en este README. En Render se configuran com
 
 | Variable | Uso |
 |---|---|
+| `ASPNETCORE_ENVIRONMENT` | `Production` |
 | `Redis__ConnectionString` | Sesión y caché de solicitudes |
 | `RabbitMq__ConnectionString` | Publicador y consumidor de mensajería |
 | `RabbitMq__QueueName` | Nombre de la cola (`solicitudes.notificaciones`) |
 | `RabbitMq__ConsumerEnabled` | `true` para habilitar el consumidor en este proceso |
 | `PORT` | Provista automáticamente por Render |
+
 
 ## Funcionalidades por pregunta
 
